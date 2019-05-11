@@ -1,4 +1,5 @@
-from conans import ConanFile, AutoToolsBuildEnvironment, tools
+from conans import ConanFile, CMake, tools
+
 import os
 
 
@@ -14,6 +15,7 @@ class IlmBaseConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "namespace_versioning": [True, False], "fPIC": [True, False]}
     requires = ("zlib/1.2.8@conan/stable")
+    generators = "cmake"
     default_options = "shared=False", "namespace_versioning=True", "fPIC=False"
 
     def config_options(self):
@@ -30,15 +32,28 @@ class IlmBaseConan(ConanFile):
                                                                                                 self.version),
             'ilmbase.tar.gz')
         tools.untargz('ilmbase.tar.gz')
-        os.unlink('ilmbase.tar.gz')
+        tools.replace_in_file("{}/ilmbase-{}/CMakeLists.txt".format(self.source_folder, self.version), "PROJECT ( ilmbase )",
+                              """PROJECT ( ilmbase )
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+set (CMAKE_CXX_STANDARD 11)""")
 
     def build(self):
-        env_build = AutoToolsBuildEnvironment(self)
+        cmake = CMake(self)
+
+        cmake.definitions.update(
+            {"OPENEXR_BUILD_SHARED": self.options.shared,
+             "BUILD_ILMBASE_STATIC": not self.options.shared,
+             "OPENEXR_VERSION": self.version,
+             "OPENEXR_SOVERSION": self.version,
+             })
+
         if "fPIC" in self.options.fields:
-            env_build.fpic = self.options.fPIC
-        config_dir = "{}/ilmbase-{}".format(self.source_folder, self.version)
-        env_build.configure(configure_dir=config_dir)
-        env_build.install()
+            cmake.definitions["CMAKE_POSITION_INDEPENDENT_CODE"] = self.options.fPIC
+
+        cmake.configure(source_dir="{}/ilmbase-{}".format(self.source_folder, self.version))
+        cmake.build(target="install")
+
 
     def package(self):
         self.copy("*.h", dst="include/OpenEXR", src="ilmbase-{}/Half".format(self.version), keep_path=False)
