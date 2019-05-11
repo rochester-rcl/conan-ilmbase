@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.12)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 CONAN_BASIC_SETUP()
-
+set (CMAKE_CXX_STANDARD 11)
 ADD_EXECUTABLE(testPackage main.cpp testMatrix.cpp)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CONAN_INCLUDE_DIRS})
 # TARGET_LINK_LIBRARIES(testPackage Half Iex IexMath IlmThread Imath)

@@ -42,8 +42,8 @@ set (CMAKE_CXX_STANDARD 11)""")
         cmake = CMake(self)
 
         cmake.definitions.update(
-            {"OPENEXR_BUILD_SHARED": self.options.shared,
-             "BUILD_ILMBASE_STATIC": not self.options.shared,
+            {"OPENEXR_BUILD_SHARED": True,
+             "BUILD_ILMBASE_STATIC": True,
              "OPENEXR_VERSION": self.version,
              "OPENEXR_SOVERSION": self.version,
              })
@@ -62,14 +62,12 @@ set (CMAKE_CXX_STANDARD 11)""")
         self.copy("*.h", dst="include/OpenEXR", src="ilmbase-{}/IlmThread".format(self.version), keep_path=False)
         self.copy("*.h", dst="include/OpenEXR", src="ilmbase-{}/Imath".format(self.version), keep_path=False)
         self.copy("IlmBaseConfig.h", dst="include/OpenEXR", src="config", keep_path=False)
-
-        self.copy("*.lib", dst="lib", src=".", keep_path=False)
-        self.copy("*.a", dst="lib", src=".", keep_path=False)
-        self.copy("*.so", dst="lib", src=".", keep_path=False)
-        self.copy("*.so.*", dst="lib", src=".", keep_path=False)
-        self.copy("*.dylib*", dst="lib", src=".", keep_path=False)
-
+        self.copy("*.so", dst="lib", src="package/lib", keep_path=False)
+        self.copy("*.so.*", dst="lib", src="package/lib", keep_path=False)
+        self.copy("*.dylib*", dst="lib", src="package/lib", keep_path=False)
         self.copy("*.dll", dst="bin", src="bin", keep_path=False)
+        self.copy("*.a", dst="lib", src="package/lib", keep_path=False)
+        self.copy("*.lib", dst="lib", src="package/lib", keep_path=False)
 
         self.copy("FindIlmBase.cmake", src=".", dst=".")
         self.copy("license*", dst="licenses", src="ilmbase-{}".format(self.version), ignore_case=True, keep_path=False)

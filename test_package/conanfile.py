@@ -1,24 +1,19 @@
+from conans.model.conan_file import ConanFile
+from conans import CMake
 import os
 
-from conans import ConanFile, CMake, tools
 
-
-class IlmbaseTestConan(ConanFile):
-    settings = "os", "compiler", "build_type", "arch"
+class DefaultNameConan(ConanFile):
+    settings = "os", "compiler", "arch", "build_type"
     generators = "cmake"
-
     def build(self):
         cmake = CMake(self)
-        # Current dir is "test_package/build/<build_id>" and CMakeLists.txt is
-        # in "test_package"
         cmake.configure()
         cmake.build()
 
     def imports(self):
-        self.copy("*.dll", dst="bin", src="bin")
-        self.copy("*.dylib*", dst="bin", src="lib")
-        self.copy('*.so*', dst='bin', src='lib')
+        self.copy(pattern="*.dll", dst="bin", src="bin")
+        self.copy(pattern="*.dylib", dst="bin", src="lib")
 
     def test(self):
-        if not tools.cross_building(self.settings):
-            self.run("cd bin && .{}testPackage".format(os.sep))
+        self.run("cd bin && .{}testPackage".format(os.sep))
