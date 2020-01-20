@@ -10,7 +10,7 @@ class IlmBaseConan(ConanFile):
     name = "IlmBase"
     description = "IlmBase is a component of OpenEXR. OpenEXR is a high dynamic-range (HDR) " \
                   "image file format developed by Industrial Light & Magic for use in computer imaging applications."
-    version = "2.3.0"
+    version = "2.4.0"
     license = "BSD"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "namespace_versioning": [True, False], "fPIC": [True, False]}
@@ -28,9 +28,9 @@ class IlmBaseConan(ConanFile):
 
     def source(self):
         # TODO use master branch of git because releases are no good with CMake
-        self.run("git clone https://github.com/openexr/openexr.git openexr")
-        tools.replace_in_file("{}/openexr/IlmBase/CMakeLists.txt".format(self.source_folder), "PROJECT(ilmbase VERSION ${ILMBASE_VERSION})",
-                              """PROJECT(ilmbase VERSION ${ILMBASE_VERSION})
+        self.run("git clone https://github.com/AcademySoftwareFoundation/openexr.git openexr")
+        tools.replace_in_file("{}/openexr/IlmBase/CMakeLists.txt".format(self.source_folder), "project(IlmBase VERSION ${ILMBASE_VERSION} LANGUAGES C CXX)",
+                              """project(IlmBase VERSION ${ILMBASE_VERSION} LANGUAGES C CXX)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 set (CMAKE_CXX_STANDARD 11)""")
