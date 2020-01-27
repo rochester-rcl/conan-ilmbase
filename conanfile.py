@@ -45,6 +45,9 @@ set (CMAKE_CXX_STANDARD 11)""")
              "OPENEXR_BUILD_STATIC": not self.options.shared,
              "OPENEXR_BUILD_PYTHON_LIBS": False,
              "OPENEXR_NAMESPACE_VERSIONING": False,
+             "INSTALL_OPENEXR_EXAMPLES": False,
+             "BUILD_TESTING": False,
+             "OPENEXR_BUILD_UTILS": False,
              "CMAKE_PREFIX_PATH": self.deps_cpp_info["zlib"].rootpath
              })
 
