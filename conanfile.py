@@ -28,8 +28,14 @@ class IlmBaseConan(ConanFile):
 
     def source(self):
         # TODO use master branch of git because releases are no good with CMake
-        self.run("git clone https://github.com/AcademySoftwareFoundation/openexr.git openexr")
-        tools.replace_in_file("{}/openexr/IlmBase/CMakeLists.txt".format(self.source_folder), "project(IlmBase VERSION ${ILMBASE_VERSION} LANGUAGES C CXX)",
+        # self.run("git clone https://github.com/AcademySoftwareFoundation/openexr.git openexr")
+        tools.download(
+            "https://github.com/AcademySoftwareFoundation/openexr/archive/v{}.tar.gz".format(self.version),
+            "openexr.tar.gz"
+        )
+        tools.untargz('openexr.tar.gz')
+        os.unlink('openexr.tar.gz')
+        tools.replace_in_file("{}/openexr-{}/IlmBase/CMakeLists.txt".format(self.source_folder, self.version), "project(IlmBase VERSION ${ILMBASE_VERSION} LANGUAGES C CXX)",
                               """project(IlmBase VERSION ${ILMBASE_VERSION} LANGUAGES C CXX)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
@@ -53,16 +59,16 @@ set (CMAKE_CXX_STANDARD 11)""")
 
         cmake.definitions["CMAKE_POSITION_INDEPENDENT_CODE"] = self.options.fPIC
 
-        cmake.configure(source_dir="{}/openexr".format(self.source_folder))
+        cmake.configure(source_dir="{}/openexr-{}".format(self.source_folder, self.version))
         cmake.build(target="install")
 
     def package(self):
-        self.copy("*.h", dst="include/OpenEXR", src="openexr/IlmBase/Half", keep_path=False)
-        self.copy("*.h", dst="include/OpenEXR", src="openexr/IlmBase/Iex".format(self.version), keep_path=False)
-        self.copy("*.h", dst="include/OpenEXR", src="openexr/IlmBase/IexMath".format(self.version), keep_path=False)
-        self.copy("*.h", dst="include/OpenEXR", src="openexr/IlmBase/IlmThread".format(self.version), keep_path=False)
-        self.copy("*.h", dst="include/OpenEXR", src="openexr/IlmBase/Imath".format(self.version), keep_path=False)
-        self.copy("IlmBaseConfig.h", dst="include/OpenEXR", src="config", keep_path=False)
+        self.copy("*.h", dst="include/OpenEXR", src="package/include/OpenEXR", keep_path=False)
+        """self.copy("*.h", dst="include/OpenEXR", src="package/IlmBase/Iex", keep_path=False)
+        self.copy("*.h", dst="include/OpenEXR", src="package/IlmBase/IexMath", keep_path=False)
+        self.copy("*.h", dst="include/OpenEXR", src="package/IlmBase/IlmThread", keep_path=False)
+        self.copy("*.h", dst="include/OpenEXR", src="package/IlmBase/Imath", keep_path=False)
+        self.copy("IlmBaseConfig.h", dst="include/OpenEXR", src="package.config", keep_path=False)"""
         self.copy("*.so", dst="lib", src="package/lib", keep_path=False)
         self.copy("*.so.*", dst="lib", src="package/lib", keep_path=False)
         self.copy("*.dylib*", dst="lib", src="package/lib", keep_path=False)
@@ -71,7 +77,7 @@ set (CMAKE_CXX_STANDARD 11)""")
         self.copy("*.lib", dst="lib", src="package/lib", keep_path=False)
 
         self.copy("FindIlmBase.cmake", src=".", dst=".")
-        self.copy("license*", dst="licenses", src="openexr".format(self.version), ignore_case=True, keep_path=False)
+        self.copy("license*", dst="licenses", src="openexr-{}".format(self.version), ignore_case=True, keep_path=False)
 
     def package_info(self):
         # TODO libs need to reflect namespace versioning
