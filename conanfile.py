@@ -12,6 +12,7 @@ class IlmBaseConan(ConanFile):
                   "image file format developed by Industrial Light & Magic for use in computer imaging applications."
     version = "2.4.0"
     license = "BSD"
+    url = "https://github.com/rochester-rcl/conan-ilmbase"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "namespace_versioning": [True, False], "fPIC": [True, False]}
     requires = ("zlib/1.2.8@conan/stable")
