@@ -38,9 +38,14 @@ class IlmBaseConan(ConanFile):
         os.unlink('openexr.tar.gz')
         tools.replace_in_file("{}/openexr-{}/IlmBase/CMakeLists.txt".format(self.source_folder, self.version), "project(IlmBase VERSION ${ILMBASE_VERSION} LANGUAGES C CXX)",
                               """project(IlmBase VERSION ${ILMBASE_VERSION} LANGUAGES C CXX)
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
-set (CMAKE_CXX_STANDARD 11)""")
+                                include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+                                if (APPLE)
+                                    conan_basic_setup(KEEP_RPATHS)
+                                else()
+                                    conan_basic_setup()
+                                endif()
+                                set (CMAKE_CXX_STANDARD 11)"""
+                                )
 
     def build(self):
         cmake = CMake(self)
